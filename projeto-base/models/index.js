@@ -14,7 +14,7 @@ Address.hasMany(Client,{
     foreignKey: 'addressId',
     as: "clients",
 });
-Client.belongsTo('Address',{
+Client.belongsTo(Address,{
     foreignKey: 'addressId',
     as: "address"
 });
@@ -23,12 +23,28 @@ Address.hasMany(Enterprise,{
   foreignKey: 'addressId',
   as: "enterprise",
 });
-Enterprise.belongsTo('Address',{
+Enterprise.belongsTo(Address,{
   foreignKey: 'addressId',
   as: "address"
 });
 
+Enterprise.hasMany(Employee,{
+  foreignKey: 'enterpriseId',
+  as: "employees"
+});
+Employee.belongsTo(Enterprise,{
+  foreignKey: "enterpriseId",
+  as: "enterprise"
+});
 
+Enterprise.hasMany(Client,{
+  foreignKey: 'enterpriseId',
+  as: "clients"
+});
+Client.belongsTo(Enterprise,{
+  foreignKey: 'enterpriseId',
+  as: "enterprise"
+});
 
 sequelize.sync()
   .then(() => console.log('Database synced'))
