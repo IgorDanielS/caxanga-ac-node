@@ -1,4 +1,5 @@
 const { Sequelize } = require('sequelize');
+const Vehicle = require('./Vehicle');
 
 const sequelize = new Sequelize({
   dialect: 'sqlite',
@@ -44,6 +45,16 @@ Enterprise.hasMany(Client,{
 Client.belongsTo(Enterprise,{
   foreignKey: 'enterpriseId',
   as: "enterprise"
+});
+
+Client.hasMany(Vehicle, {
+  foreignKey: 'clientId',
+  as: 'vehicles'
+});
+
+Vehicle.belongsTo(Client, {
+  foreignKey: 'clientId',
+  as: 'client'
 });
 
 sequelize.sync( {force: true})
