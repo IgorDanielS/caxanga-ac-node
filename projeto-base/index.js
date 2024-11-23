@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const { sequelize, Address, Client, Employee, Enterprise} = require('./models');
+const { sequelize, Address, Client, Employee, Enterprise, Appointment} = require('./models');
 
 const app = express();
 app.use(bodyParser.json());
@@ -258,6 +258,79 @@ app.delete('/employee/:id', async (req, res) => {
       res.status(500).json({ error: error.message });
     }
 });
+
+//ENDPOINT'S DE appointment
+
+app.post('/appointment/:clientId', async (req, res) => {
+  try {
+    const client = await Client.findByPk(req.params.clientId);
+    if (client) {
+      const appointment = await Appointment.create({ ...req.body, clientId :client.id });
+      res.status(201).json(appointment);
+    } else {
+      res.status(404).json({ error: 'Client not found' });
+    }
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+app.get('/appointment', async (req, res) => {
+  try {
+    const appointment = await Appointment.findAll({
+      include: ['client'],
+    });
+    res.json(appointment);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
+app.get('/appointment/:id', async (req, res) => {
+  try {
+    const appointment = await Appointment.findByPk(req.params.id);
+    if (appointment) {
+      res.json(appointment);
+    } else {
+      res.status(404).json({ error: 'Appointment not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.put('/appointment/:id', async (req, res) => {
+  try {
+    const appointment = await Appointment.findByPk(req.params.id);
+    if (appointment) {
+      await appointment.update(req.body);
+      res.json(appointment);
+    } else {
+      res.status(404).json({ error: 'Appointment not found' });
+    }
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+app.delete('/appointment/:id', async (req, res) => {
+  try {
+    const appointment = await Appointment.findByPk(req.params.id);
+    if (appointment) {
+      await appointment.destroy();
+      res.json({ message: 'Appointment deleted' });
+    } else {
+      res.status(404).json({ error: 'Appointment not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
+
+
 
 const PORT = 3000;
 app.listen(PORT, () => {

@@ -8,7 +8,8 @@ const sequelize = new Sequelize({
 const Address = require('./Address')(sequelize);
 const Client = require('./Client')(sequelize);
 const Employee = require('./Employee')(sequelize);
-const Enterprise = require('./Enterprise')(sequelize)
+const Enterprise = require('./Enterprise')(sequelize);
+const Appointment = require('./Appointment')(sequelize);
 
 Address.hasMany(Client,{
     foreignKey: 'addressId',
@@ -46,8 +47,13 @@ Client.belongsTo(Enterprise,{
   as: "enterprise"
 });
 
+Appointment.belongsTo(Client, {
+  foreignKey: 'clientId',
+  as: 'client',
+});
+
 sequelize.sync( {force: true})
   .then(() => console.log('Database synced'))
   .catch(err => console.error('Error syncing database:', err));
 
-module.exports = { sequelize, Address, Client, Employee, Enterprise };
+module.exports = { sequelize, Address, Client, Employee, Enterprise, Appointment };
