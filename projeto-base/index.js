@@ -1,6 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const { sequelize, Address, Client, Employee, Enterprise, Appointment} = require('./models');
+const { sequelize, Address, Client, Employee, Enterprise} = require('./models');
+const Vehicle = require('./models/Vehicle');
 
 const app = express();
 app.use(bodyParser.json());
@@ -329,6 +331,73 @@ app.delete('/appointment/:id', async (req, res) => {
 });
 
 
+
+
+
+//ENDPOINT'S VEHICLE
+app.post('/vehicle/:clientId', async (req, res) => {
+  try {
+    const client = await Client.findByPk(req.params.clientId);
+    if (client) {
+      const vehicle = await Vehicle.create({ ...req.body, clientId :client.id });
+      res.status(201).json(vehicle);
+    } else {
+      res.status(404).json({ error: 'vehicle not found' });
+    }
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+app.get('/vehicle', async (req, res) => {
+    try {
+      const vehicle = await Vehicle.findAll();
+      res.json(vehicle);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+});
+  
+app.get('/vehicle/:id', async (req, res) => {
+    try {
+      const vehicle = await Vehicle.findByPk(req.params.id);
+      if (vehicle) {
+        res.json(vehicle);
+      } else {
+        res.status(404).json({ error: 'vehicle not found' });
+      }
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+});
+  
+app.put('/vehicle/:id', async (req, res) => {
+    try {
+      const vehicle = await Vehicle.findByPk(req.params.id);
+      if (vehicle) {
+        await vehicle.update(req.body);
+        res.json(vehicle);
+      } else {
+        res.status(404).json({ error: 'vehicle not found' });
+      }
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+});
+  
+app.delete('/vehicle/:id', async (req, res) => {
+    try {
+      const vehicle = await Vehicle.findByPk(req.params.id);
+      if (vehicle) {
+        await vehicle.destroy();
+        res.json({ message: 'vehicle deleted' });
+      } else {
+        res.status(404).json({ error: 'vehicle not found' });
+      }
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+});
 
 
 
