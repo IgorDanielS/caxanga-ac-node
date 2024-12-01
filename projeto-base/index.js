@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const {Address, Client, Employee, Enterprise, Appointment, Vehicle, Transfer, sequelize} = require('./models');
+const {Address, Client, Employee, Enterprise, Appointment, Vehicle, Transfer, Service, SeriviceEmployee, sequelize} = require('./models');
 
 const app = express();
 app.use(bodyParser.json());
@@ -528,3 +528,145 @@ app.delete('/transfer/:id', async (req, res) => {
   }
 });
 
+//ENDPOINTS SERVICE
+// Criar um novo serviço
+app.post('/service', async (req, res) => {
+  try {
+    const service = await Service.create(req.body);
+    res.status(201).json(service);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// Obter todos os serviços
+app.get('/service', async (req, res) => {
+  try {
+    const services = await Service.findAll();
+    res.json(services);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// Obter um serviço por ID
+app.get('/service/:id', async (req, res) => {
+  try {
+    const service = await Service.findByPk(req.params.id);
+    if (service) {
+      res.json(service);
+    } else {
+      res.status(404).json({ error: 'Service not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Atualizar um serviço
+app.put('/service/:id', async (req, res) => {
+  try {
+    const service = await Service.findByPk(req.params.id);
+    if (service) {
+      await service.update(req.body);
+      res.json(service);
+    } else {
+      res.status(404).json({ error: 'Service not found' });
+    }
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// Deletar um serviço
+app.delete('/service/:id', async (req, res) => {
+  try {
+    const service = await Service.findByPk(req.params.id);
+    if (service) {
+      await service.destroy();
+      res.json({ message: 'Service deleted' });
+    } else {
+      res.status(404).json({ error: 'Service not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+//ENDPOINT SERVICEEMPLOYEE
+
+// Adicionar um empregado a um serviço (criar associação na tabela ServiceEmployee)
+app.post('/service/:serviceId/employee/:employeeId', async (req, res) => {
+  try {
+    const service = await Service.findByPk(req.params.serviceId);
+    const employee = await Employee.findByPk(req.params.employeeId);
+
+    if (service && employee) {
+      // Cria a associação entre Service e Employee
+      await service.addEmployee(employee);
+      res.status(201).json({ message: 'Employee added to service' });
+    } else {
+      res.status(404).json({ error: 'Service or Employee not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Remover um empregado de um serviço (remover associação na tabela ServiceEmployee)
+app.delete('/service/:serviceId/employee/:employeeId', async (req, res) => {
+  try {
+    const service = await Service.findByPk(req.params.serviceId);
+    const employee = await Employee.findByPk(req.params.employeeId);
+
+    if (service && employee) {
+      // Remove a associação entre Service e Employee
+      await service.removeEmployee(employee);
+      res.json({ message: 'Employee removed from service' });
+    } else {
+      res.status(404).json({ error: 'Service or Employee not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Obter todos os empregados de um serviço
+app.get('/service/:serviceId/employees', async (req, res) => {
+  try {
+    const service = await Service.findByPk(req.params.serviceId, {
+      include: {
+        model: Employee,
+        as: 'employees',
+      },
+    });
+
+    if (service) {
+      res.json(service.employees);
+    } else {
+      res.status(404).json({ error: 'Service not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Obter todos os serviços de um empregado
+app.get('/employee/:employeeId/services', async (req, res) => {
+  try {
+    const employee = await Employee.findByPk(req.params.employeeId, {
+      include: {
+        model: Service,
+        as: 'services',
+      },
+    });
+
+    if (employee) {
+      res.json(employee.services);
+    } else {
+      res.status(404).json({ error: 'Employee not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
