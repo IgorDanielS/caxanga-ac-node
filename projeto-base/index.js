@@ -1,9 +1,14 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const {Address, Client, Employee, Enterprise, Appointment, Vehicle, sequelize} = require('./models');
+const {Address, Client, Employee, Enterprise, Appointment, Vehicle, Transfer, sequelize} = require('./models');
 
 const app = express();
 app.use(bodyParser.json());
+
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
 
 
 //ENDPOINT'S DE ADDRESS
@@ -458,3 +463,68 @@ app.delete('/product/:id', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+// ENDPOINTS DE TRANSFER
+app.post('/transfer', async (req, res) => {
+  try {
+    const transfer = await Transfer.create(req.body);
+    res.status(201).json(transfer);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+app.get('/transfer', async (req, res) => {
+  try {
+    const transfers = await Transfer.findAll({
+      include: { model: Product, as: 'products' } 
+    });
+    res.json(transfers);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/transfer/:id', async (req, res) => {
+  try {
+    const transfer = await Transfer.findByPk(req.params.id, {
+      include: { model: Product, as: 'products' } 
+    });
+    if (transfer) {
+      res.json(transfer);
+    } else {
+      res.status(404).json({ error: 'Transfer not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.put('/transfer/:id', async (req, res) => {
+  try {
+    const transfer = await Transfer.findByPk(req.params.id);
+    if (transfer) {
+      await transfer.update(req.body);
+      res.json(transfer);
+    } else {
+      res.status(404).json({ error: 'Transfer not found' });
+    }
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+app.delete('/transfer/:id', async (req, res) => {
+  try {
+    const transfer = await Transfer.findByPk(req.params.id);
+    if (transfer) {
+      await transfer.destroy();
+      res.json({ message: 'Transfer deleted' });
+    } else {
+      res.status(404).json({ error: 'Transfer not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
