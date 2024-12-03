@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const {Address, Client, Employee, Enterprise, Appointment, Vehicle, Transfer, Service, SeriviceEmployee, sequelize} = require('./models');
+const {Address, Client, Employee, Enterprise, Appointment, Vehicle, Transfer, Service, SeriviceEmployee, Stock, sequelize} = require('./models');
 
 const app = express();
 app.use(bodyParser.json());
@@ -665,6 +665,71 @@ app.get('/employee/:employeeId/services', async (req, res) => {
       res.json(employee.services);
     } else {
       res.status(404).json({ error: 'Employee not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ENDPOINT DE STOCK
+
+// Criar estoque
+app.post('/stock', async (req, res) => {
+  try {
+    const stock = await Stock.create(req.body);
+    res.status(201).json(stock);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+app.get('/stock', async (req, res) => {
+  try {
+    const stocks = await Stock.findAll();
+    res.json(stock);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// Buscar estoque por id
+app.get('/stock/:id', async (req, res) => {
+  try {
+    const stock = await Stock.findByPk(req.params.id);
+    if (stock) {
+      res.json(stock);
+    } else {
+      res.status(404).json({ error: 'Stock not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Atualizar estoque
+app.put('/stock/:id', async (req, res) => {
+  try {
+    const stock = await Stock.findByPk(req.params.id);
+    if (stock) {
+      await stock.update(req.body);
+      res.json(stock);
+    } else {
+      res.status(404).json({ error: 'Stock not found' });
+    }
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// Deletar estoque
+app.delete('/stock/:id', async (req, res) => {
+  try {
+    const stock = await Stock.findByPk(req.params.id);
+    if (stock) {
+      await stock.destroy();
+      res.json({ message: 'Stock deleted' });
+    } else {
+      res.status(404).json({ error: 'Stock not found' });
     }
   } catch (error) {
     res.status(500).json({ error: error.message });

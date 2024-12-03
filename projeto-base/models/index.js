@@ -15,6 +15,7 @@ const Product = require('./Product')(sequelize);
 const Transfer = require('./Transfer')(sequelize);
 const Service = require('./Service')(sequelize);
 const SeriviceEmployee = require('./ServiceEmployee')(sequelize);
+const Stock = require('./Stock')(sequelize);
 
 
 Address.hasMany(Client,{
@@ -83,11 +84,17 @@ Employee.belongsToMany(Service,{
   foreignKey: 'employeeid',
   otherKey: 'serviceId',
 });
+Stock.hasMany(Product,{
+  foreignKey: 'transferId',
+  as: 'products',
+});
+Stock.belongsTo(Enterprise,{
+  foreignKey: 'enterpriseId',
+  as: 'enterprise',
+});
 
 sequelize.sync( {force: true})
-  .then(() => console.log('Database synced'))
-  .catch(err => console.error('Error syncing database:', err));
+.then(() => console.log('Database synced'))
+.catch(err => console.error('Error syncing database:', err));
 
-module.exports = { sequelize, Address, Client, Employee, Enterprise, Appointment, Vehicle, Transfer, Product, Service };
-
-
+module.exports = { sequelize, Address, Client, Employee, Enterprise, Appointment, Vehicle, Transfer, Product, Service, Stock };
