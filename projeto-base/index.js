@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const {Address, Client, Employee, Enterprise, Appointment, Vehicle, Transfer, Service, SeriviceEmployee, Stock, sequelize} = require('./models');
+const {Address, Client, Employee, Enterprise, Appointment, Vehicle, Transfer, Service, ServiceEmployee, Stock, sequelize} = require('./models');
 
 const app = express();
 app.use(bodyParser.json());

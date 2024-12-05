@@ -13,15 +13,15 @@ module.exports = (sequelize) => {
         serviceId: {
             type: DataTypes.INTEGER,
             references: {
-                model: 'Services', // O nome da tabela
-                key: 'id', // A chave primária do modelo Service
+                model: 'Services', 
+                key: 'id', 
             },
         },
         employeeId: {
             type: DataTypes.INTEGER,
             references: {
-                model: 'Employees', // O nome da tabela
-                key: 'id', // A chave primária do modelo Employee
+                model: 'Employees', 
+                key: 'id', 
             },
         },
     });

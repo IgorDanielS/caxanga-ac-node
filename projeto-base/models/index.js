@@ -14,7 +14,7 @@ const Vehicle = require('./Vehicle')(sequelize);
 const Product = require('./Product')(sequelize);
 const Transfer = require('./Transfer')(sequelize);
 const Service = require('./Service')(sequelize);
-const SeriviceEmployee = require('./ServiceEmployee')(sequelize);
+const ServiceEmployee = require('./ServiceEmployee')(sequelize);
 const Stock = require('./Stock')(sequelize);
 
 
@@ -79,11 +79,13 @@ Service.belongsToMany(Employee,{
   foreignKey: 'serviceId',
   otherKey: 'employeeId',
 });
+
 Employee.belongsToMany(Service,{
   through: 'ServiceEmployee',
-  foreignKey: 'employeeid',
+  foreignKey: 'employeeId',
   otherKey: 'serviceId',
 });
+
 Stock.hasMany(Product,{
   foreignKey: 'transferId',
   as: 'products',
